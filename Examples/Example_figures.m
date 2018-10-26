@@ -53,18 +53,6 @@ for j = 1:Nx
 end
 sensor_data = sort_data; 
 
-% RT smooth
-unsorted_data = signalRT_smooth;
-sort_data = unsorted_data;
-for i = 1:Ny-2
-    sort_data(Nx + i, :) = unsorted_data(Nx + 2*i, :);
-    sort_data(Nx + Ny - 1 + Nx - 1 + i, :) = unsorted_data(Nx + 2*(Ny - 1) - 2*i + 1, :);
-end
-for j = 1:Nx
-    sort_data(Nx + Ny - 2 + j, :) = unsorted_data(Nx + 2*Ny + Nx - 3 - j, :);
-end
-signalRT_smooth = sort_data; 
-
 % RT nonsmooth
 unsorted_data = signalRT_nonsmooth;
 sort_data = unsorted_data;
@@ -85,10 +73,7 @@ signalRT_nonsmooth = sort_data;
 maxKW = max(sensor_data(:));
 normKW = maxKW; 
 signalKW_norm = sensor_data/normKW;
-% RT smooth
-maxRT_smooth = max(signalRT_smooth(:));
-normRT_smooth = maxRT_smooth;
-signalRT_smooth_norm = signalRT_smooth/normRT_smooth;
+
 % RT nonsmooth
 maxRT_nonsmooth = max(signalRT_nonsmooth(:));
 normRT_nonsmooth = maxRT_nonsmooth;
@@ -111,18 +96,6 @@ ylabel('Sensor');
 set(gca,'FontSize',fontSize);
 set(gcf, 'pos', positionYNoBar);
 
-% RT smooth
-figure;
-surf(1e6*Rgrid.tForward, 1:nSources, signalRT_smooth_norm, 'EdgeColor', 'none');
-axis([0 40 1 nSources]);
-view(2);
-box on;
-caxis([-0.4 1]);
-xlabel('t [\mus]');
-%ylabel('Sensor');
-set(gca,'FontSize',fontSize);
-set(gcf, 'pos', positionNoYNoBar);
-
 % RT nonsmooth
 figure;
 surf(1e6*Rgrid.tForward, 1:nSources, signalRT_nonsmooth_norm, 'EdgeColor', 'none');
@@ -138,23 +111,6 @@ set(gcf, 'pos', positionNoYBar);
 %========================================
 % FIGURES - ERROR
 %========================================
-% Error
-signal = dcol_neg(signalRT_smooth_norm);
-error_RTsmooth = signal - signalKW_norm;
-
-% Error - RT smooth
-signal = dcol_neg(signalRT_smooth_norm);
-error_RTsmooth = signal - signalKW_norm;
-figure;
-surf(1e6*Rgrid.tForward, 1:nSources, error_RTsmooth, 'EdgeColor', 'none');
-axis([0 40 1 nSources]);
-view(2);
-box on;
-caxis([-0.5 0.5]);
-xlabel('t [\mus]');
-ylabel('Sensor');
-set(gca,'FontSize',fontSize);
-set(gcf, 'pos', positionYNoBar);
 
 % RT nonsmooth
 signal = dcol_neg(signalRT_nonsmooth_norm);

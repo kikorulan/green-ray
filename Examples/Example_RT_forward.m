@@ -22,8 +22,11 @@ Rgrid = gridRT(Nx, dx, Ny, dy);
 % Build domain
 Rgrid.setCMatrix(medium.sound_speed);
 
-% Smoothed initial pressure
-Rgrid.setUMatrix(sourceKW.p0);
+% non-smoothed initial pressure
+inputIm = imread('../Phantoms/Veins_modified.jpg');
+u0 = double(255-inputIm)/255;
+Rgrid.setUMatrix(u0);
+
 
 %========================================
 % Impulse Response
@@ -58,25 +61,7 @@ tStep = dt;
 %================================================================================
 % FORWARD PROBLEM
 %================================================================================
-% Sources locations
-clear x;
-for n = 1:Rgrid.Nx
-    x{n} = cat(3, (n-1)*Rgrid.dx, 0);
-end
-for n = 1:Rgrid.Ny-2
-    x{2*n-1+Rgrid.Nx}   = cat(3,                   0, n*Rgrid.dy);
-    x{2*n  +Rgrid.Nx}   = cat(3, (Rgrid.Nx-1)*Rgrid.dx, n*Rgrid.dy);
-end
-for n = 1:Rgrid.Nx
-    x{n+Rgrid.Nx+2*(Rgrid.Ny-2)} = cat(3, (n-1)*Rgrid.dx, (Rgrid.Ny-1)*Rgrid.dy);
-end
-source = Rgrid.computeForwardParallel(x, 0, 2*pi-0.01, nRays, tStep, tMax, 'p', true);
-signalRT_smooth = zeros(nSources, length(source(1).aForward));
-for n = 1:nSources
-    signalRT_smooth(n, :) = source(n).aForward;
-end
 
-save signalRT_smooth signalRT_smooth;
 %========================================
 % Sensor Selection
 %========================================
