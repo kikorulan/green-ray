@@ -115,7 +115,7 @@ classdef gridRT < gridC
     %======================================================================
     % Find Coordinates in the grid
     %======================================================================
-    methods (Access = private)
+    methods (Access = public)
         % Find Coordinates
         coord = findCoordinates(grid, point);
         % Find Neighbours

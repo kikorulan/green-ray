@@ -39,6 +39,8 @@ classdef Source < handle
         q = [];
 
         %%% Gaussian Beams
+        freq = [];
+        beamwidth = [];
         xGB = []
         qGB = []
         amplitudeGB = []
@@ -46,8 +48,6 @@ classdef Source < handle
         Y = [];
         N = [];
         M = [];
-
-
 
     end
 
@@ -202,14 +202,23 @@ classdef Source < handle
         % Set the values for the time signal computation
         function s0 = setForwardSignal(s0, aForward); s0.aForward = aForward; end;
         function s0 = setForwardSignal_initial(s0, aForward_initial); s0.aForward_initial = aForward_initial; end;
+        % Set frequency and beamwidth for GB
+        function s0 = setFrequency(s0, freq); s0.freq = freq; end;
+        function s0 = setBeamwidth(s0, bw); s0.beamwidth = bw; end;
     end
 
+    %====================================================================
+    % Find particular ray
+    %====================================================================
+    methods
+        [x, phi, n, q, p, index_ray, index_time] = trace_point(source, grid, xP);
+    end
     %====================================================================
     % Plot
     %====================================================================
     methods
         % Plot the ray trajectories
-        h = plot_rays(source, grid, nColours);
+        h = plot_rays(source, grid, nColours, scale);
         % Plot the ray trajectories
         h = plot_subrays(source, grid, nColours);
         % Plot Q

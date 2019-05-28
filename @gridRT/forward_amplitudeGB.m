@@ -15,42 +15,45 @@ source.deleteAmplitude(); % Delete amplitude in case it has been previously comp
 step = source.step; % step size
 [nR nPoints dim] = size(source.x); % Number of rays
 % Initial conditions
-w0 = 1e1;
-q0 = i*w0*grid.dx*grid.dx*5;%w0*grid.dx*grid.dx*5;
+if (isempty(source.freq) || isempty(source.beamwidth))
+    error('Please set frequency and beamwidth for GB');
+end
+w0 = 2*pi*source.freq;
+q0 = j*w0*source.beamwidth*source.beamwidth*0.5;
 q = repmat(q0, [nR 1 1]);
 u = repmat(1, [nR 1 1]);
 
-source.insertQGB(q, 1);
+source.insertQ(q, 1);
 source.insertKIndex(u, 1);
 %==============================
 % Gaussian Beam 
 %==============================
-for j = 1:nPoints-1 % Last step not compatible with RK2
+for ii = 1:nPoints-1 % Last step not compatible with RK2
     % Update Dx, Dp    
-    [q, u] = grid.stepRK2GB(source, step, j, q, u);
-    source.insertQGB(q, j+1);
-    source.insertKIndex(u, j+1);
+    [q, u] = grid.stepRK2GB(source, step, ii, q, u);
+    source.insertQ(q, ii+1);
+    source.insertKIndex(u, ii+1);
 end
 % Compute amplitude for all rays
 %A = sqrt(1./source.q./source.n);
-qGB = source.qGB;
+qGB = source.q;
 %source.insertQVector(sqrt(-2./imag(source(1).kIndex./qGB)));
 
-%==============================
-% Q - Proximal Ray
-%==============================
-x = source.x;
-% For computing the determinant
-difPhi1 = x(1:end-1, 1:end-1, :) - source.x(2:end, 1:end-1, :);
-difPhi = cat(1, difPhi1, x(end-1, 1:end-1, :) - x(end, 1:end-1, :));
-difTau = x(:, 2:end, :) - x(:, 1:end-1, :);
-flipDifTau(:, :, 2) = -difTau(:, :, 1);
-flipDifTau(:, :, 1) = difTau(:, :, 2); 
-% Q
-q = sum(difPhi.*flipDifTau, 3);
-q = [q repmat(NaN, [nR 1 1])];
-source.insertQVector(q);
-%source.insertDXVector(q);
+%%  %==============================
+%%  % Q - Proximal Ray
+%%  %==============================
+%%  x = source.x;
+%%  % For computing the determinant
+%%  difPhi1 = x(1:end-1, 1:end-1, :) - source.x(2:end, 1:end-1, :);
+%%  difPhi = cat(1, difPhi1, x(end-1, 1:end-1, :) - x(end, 1:end-1, :));
+%%  difTau = x(:, 2:end, :) - x(:, 1:end-1, :);
+%%  flipDifTau(:, :, 2) = -difTau(:, :, 1);
+%%  flipDifTau(:, :, 1) = difTau(:, :, 2); 
+%%  % Q
+%%  q = sum(difPhi.*flipDifTau, 3);
+%%  q = [q repmat(NaN, [nR 1 1])];
+%%  source.insertQVector(q);
+%%  %source.insertDXVector(q);
 
 %%  %==============================
 %%  % Q - ODE method

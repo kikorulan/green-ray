@@ -1,4 +1,4 @@
-function h = plot_rays(source, grid, nRays)
+function h = plot_rays(source, grid, nRays, scale)
 % PLOT_RAYS Plots the ray trajectories for the given sources
 %function h = plot_rays(source, grid, nColours)
 % INPUTS
@@ -13,12 +13,31 @@ function h = plot_rays(source, grid, nRays)
 totalRays = size(source.x, 1);
 h = figure;
 hold on;
-axis([0 1e3*grid.xAxis(end) 0 1e3*grid.yAxis(end)]);
+switch scale
+    case 'mm'
+        factorScale = 1e3;
+    case 'm'
+        factorScale = 1;
+    case 'km'
+        factorScale = 1e-3;
+end
+axis([0 factorScale*grid.xAxis(end) 0 factorScale*grid.yAxis(end)]);
 colourList = cool(min(nRays, totalRays));
 factor = max(1, floor(totalRays/nRays));
 for j = 1:min(nRays, totalRays)
-    plot(1e3*source.x(factor*j, :, 1), 1e3*source.x(factor*j, :, 2), 'Color', colourList(j, :));
+    plot(factorScale*source.x(factor*j, :, 1), factorScale*source.x(factor*j, :, 2), 'Color', colourList(j, :));
 end
-xlabel('x [mm]');
-ylabel('y [mm]');
+
+switch scale
+    case 'mm'
+        xlabel('x [mm]');
+        ylabel('y [mm]');
+    case 'm'
+        xlabel('x [m]');
+        ylabel('y [m]');
+    case 'km'
+        xlabel('x [km]');
+        ylabel('y [km]');
+end     
 title('Ray Trajectories');
+box on;
